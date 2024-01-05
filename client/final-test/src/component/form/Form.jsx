@@ -1,32 +1,33 @@
 import React, { useState } from "react";
 
-const Form = () => {
-  const [task, setTask] = useState("");
-  const [taskList, setTaskList] = useState(
+const Form = (props) => {
+  const [todo, setTodo] = useState("");
+  const [todoList, setTodoList] = useState(
     JSON.parse(localStorage.getItem("taskList")) || []
   );
 
   const handleInputChange = (event) => {
-    setTask(event.target.value);
+    setTodo(event.target.value);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const newTask = {
-      title: task,
+      title: todo,
       status: false,
     };
-    const updatedTaskList = [...taskList, newTask];
-    setTaskList(updatedTaskList);
+    const updatedTaskList = [...todoList, newTask];
+    setTodoList(updatedTaskList);
     localStorage.setItem("taskList", JSON.stringify(updatedTaskList));
-    setTask("");
+    setTodo("");
+    props.method(!props.changeValue)
   };
 
   return (
     <form className="form" onSubmit={handleSubmit}>
       <input
         placeholder="Enter task ..."
-        value={task}
+        value={todo}
         onChange={handleInputChange}
       />
       <button>Submit</button>

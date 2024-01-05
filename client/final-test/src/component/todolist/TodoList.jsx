@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { FaCircle, FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaCircle } from "react-icons/fa";
 
-const TodoList = () => {
-  const [taskList, setTaskList] = useState(
+const TodoList = (props) => {
+  const [todoList, setTodoList] = useState(
     JSON.parse(localStorage.getItem("taskList")) || []
   );
+    
+  useEffect(()=>{
+    setTodoList(JSON.parse(localStorage.getItem("taskList")))
+  },[props.changeValue])
 
   useEffect(() => {
     const handleStorageChange = (event) => {
       if (event.key === "taskList") {
-        setTaskList(JSON.parse(event.newValue));
+        setTodoList(JSON.parse(event.newValue));
       }
     };
 
@@ -21,22 +25,47 @@ const TodoList = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("taskList", JSON.stringify(taskList));
-  }, [taskList]);
+    localStorage.setItem("taskList", JSON.stringify(todoList));
+  }, [todoList]);
 
   const handleTaskStatusChange = (index) => {
-    const updatedTaskList = [...taskList];
-    updatedTaskList[index] = {
-      ...updatedTaskList[index],
-      status: !updatedTaskList[index].status,
+    const updateTodoList = [...todoList];
+    updateTodoList[index] = {
+      ...updateTodoList[index],
+      status: !updateTodoList[index].status,
     };
-    setTaskList(updatedTaskList);
+    setTodoList(updateTodoList);
   };
+
+  const TodoItem = ({ task, index, handleTaskStatusChange }) => {
+    return (
+      <div
+        className={`todo-item-container ${task.status ? "done" : ""}`}
+        key={index}
+      >
+        {task.status ? (
+          <FaCheckCircle
+            className="item-done-button"
+            color="#9a9a9a"
+            onClick={() => handleTaskStatusChange(index)}
+          />
+        ) : (
+          <FaCircle
+            className="item-done-button"
+            color="#9a9a9a"
+            onClick={() => handleTaskStatusChange(index)}
+          />
+        )}
+        <div className="item-title">{task.title}</div>
+      </div>
+    );
+  };
+  
 
   return (
     <div className="todo-list-container">
-      {taskList.length > 0 &&
-        taskList.map((task, index) => (
+      {todoList.length > 0 &&
+        todoList.map((task, index) => (
           <TodoItem
             key={index}
             task={task}
@@ -44,30 +73,7 @@ const TodoList = () => {
             handleTaskStatusChange={handleTaskStatusChange}
           />
         ))}
-    </div>
-  );
-};
-
-const TodoItem = ({ task, index, handleTaskStatusChange }) => {
-  return (
-    <div
-      className={`todo-item-container ${task.status ? "done" : ""}`}
-      key={index}
-    >
-      {task.status ? (
-        <FaCheckCircle
-          className="item-done-button"
-          color="#9a9a9a"
-          onClick={() => handleTaskStatusChange(index)}
-        />
-      ) : (
-        <FaCircle
-          className="item-done-button"
-          color="#9a9a9a"
-          onClick={() => handleTaskStatusChange(index)}
-        />
-      )}
-      <div className="item-title">{task.title}</div>
+       
     </div>
   );
 };
